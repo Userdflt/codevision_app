@@ -1,4 +1,4 @@
-# Code Vision App
+# Code Vision App - Work in Progress
 
 A Python-powered AI agent system for querying building codes and regulations with clause-specific expertise.
 
@@ -127,7 +127,3 @@ Once running, visit:
 2. Make your changes
 3. Run tests and linting: `make test lint`
 4. Submit a pull request
-
-## License
-
-[Add your license here]
