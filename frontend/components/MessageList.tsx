@@ -3,14 +3,9 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { Message } from '../lib/api'
 import LoadingIndicator from './LoadingIndicator'
 import SourceCard from './SourceCard'
-
-interface MessageListProps {
-  messages: Message[]
-  isLoading: boolean
-}
+import { MessageListProps } from '../lib/types'
 
 export default function MessageList({ messages, isLoading }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -25,7 +20,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex items-center justify-center h-full text-muted-foreground">
         <div className="text-center">
           <p className="text-lg mb-2">Welcome to Code Vision!</p>
           <p className="text-sm">
@@ -47,27 +42,25 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
         <div
           key={message.id}
           className={`flex ${
-            message.role === 'user' ? 'justify-end' : 'justify-start'
+            message.type === 'user' ? 'justify-end' : 'justify-start'
           }`}
         >
           <div
             className={`max-w-[80%] rounded-lg px-4 py-3 ${
-              message.role === 'user'
-                ? 'bg-primary-600 text-white'
-                : message.isError
-                ? 'bg-red-50 border border-red-200 text-red-700'
-                : 'bg-gray-50 border border-gray-200 text-gray-900'
+              message.type === 'user'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted border border-border text-muted-foreground'
             }`}
           >
-            {message.role === 'user' ? (
+            {message.type === 'user' ? (
               <p className="whitespace-pre-wrap">{message.content}</p>
             ) : (
               <div>
-                <div className="prose prose-sm max-w-none">
+                <div className="prose prose-sm max-w-none dark:prose-invert">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      code({ node, inline, className, children, ...props }) {
+                      code({ node, inline, className, children, ...props }: any) {
                         const match = /language-(\w+)/.exec(className || '')
                         return !inline && match ? (
                           <SyntaxHighlighter
@@ -91,19 +84,10 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
                   </ReactMarkdown>
                 </div>
                 
-                {/* Agent and Sources Info */}
-                {message.agentUsed && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2">
-                      Answered by: {message.agentUsed.replace('_', ' ').toUpperCase()}
-                    </p>
-                  </div>
-                )}
-                
                 {/* Sources */}
                 {message.sources && message.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 mb-2 font-medium">
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2 font-medium">
                       Sources:
                     </p>
                     <div className="space-y-2">
@@ -118,7 +102,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
             
             {/* Timestamp */}
             <p className={`text-xs mt-2 ${
-              message.role === 'user' ? 'text-primary-100' : 'text-gray-500'
+              message.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
             }`}>
               {message.timestamp.toLocaleTimeString()}
             </p>
@@ -128,7 +112,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
       
       {isLoading && (
         <div className="flex justify-start">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+          <div className="bg-muted border border-border rounded-lg px-4 py-3">
             <LoadingIndicator />
           </div>
         </div>

@@ -1,23 +1,99 @@
 import { useState, useEffect } from 'react'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
-import Layout from '../components/Layout'
+import { Session } from '@supabase/supabase-js'
 import ChatInterface from '../components/ChatInterface'
 import AuthModal from '../components/AuthModal'
+import HeroSection from '../components/HeroSection'
+import Features from '../components/features-2'
+import ContentSection from '../components/content-1'
+import Footer from '../components/footer'
+import { useSupabase } from './_app'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
-  const session = useSession()
-  const supabase = useSupabaseClient()
+  const { supabase } = useSupabase()
+  const [session, setSession] = useState<Session | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
-    if (!session) {
-      setShowAuthModal(true)
-    }
-  }, [session])
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      if (session) {
+        setShowChat(true)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    setShowChat(false)
+  }
+
+  const handleGetStarted = () => {
+    if (session) {
+      setShowChat(true)
+    } else {
+      setShowAuthModal(true)
+    }
+  }
+
+  if (showChat && session) {
+    return (
+      <>
+        <Head>
+          <title>Code Vision - AI Building Code Assistant</title>
+          <meta name="description" content="AI-powered assistant for Australian building codes and regulations" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+
+        <div className="min-h-screen bg-background">
+          {/* Chat Header */}
+          <header className="bg-background border-b border-border shadow-sm">
+            <div className="container mx-auto px-4">
+              <div className="flex justify-between items-center h-16">
+                <div className="flex items-center">
+                  <h1 className="text-xl font-bold text-foreground">
+                    Code Vision
+                  </h1>
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    AI Building Code Assistant
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowChat(false)}
+                  >
+                    Back to Home
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Chat Interface */}
+          <main className="container mx-auto px-4 py-8">
+            <ChatInterface userId={session.user.id} />
+          </main>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -35,31 +111,51 @@ export default function Home() {
         />
       </Head>
 
-      <Layout
-        user={session?.user}
-        onSignOut={handleSignOut}
-      >
-        {session ? (
-          <ChatInterface userId={session.user.id} />
-        ) : (
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Welcome to Code Vision
-              </h2>
-              <p className="text-gray-600 mb-8">
-                Your AI-powered assistant for Australian building codes and regulations
-              </p>
-              <button
-                onClick={() => setShowAuthModal(true)}
-                className="bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+      <div className="min-h-screen bg-background">
+        {/* Hero Section with custom CTA */}
+        <HeroSection />
+        
+        {/* Custom CTA section replacing the hero buttons */}
+        <section className="py-16 bg-muted/50">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              Ready to streamline your building code compliance?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Get instant answers to complex building code questions with our AI-powered assistant. 
+              From fire safety requirements to structural specifications.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                onClick={handleGetStarted}
+                className="text-lg px-8 py-3"
               >
-                Sign In to Get Started
-              </button>
+                {session ? 'Open Chat Assistant' : 'Get Started'}
+              </Button>
+              {!session && (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={() => setShowAuthModal(true)}
+                  className="text-lg px-8 py-3"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
-        )}
-      </Layout>
+        </section>
+
+        {/* Features Section */}
+        <Features />
+
+        {/* Content Section */}
+        <ContentSection />
+
+        {/* Footer */}
+        <Footer />
+      </div>
 
       <AuthModal
         isOpen={showAuthModal}

@@ -1,12 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, FormEvent, KeyboardEvent } from 'react'
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import { v4 as uuidv4 } from 'uuid'
 import MessageList from './MessageList'
-import { Message, sendChatMessage } from '../lib/api'
-
-interface ChatInterfaceProps {
-  userId: string
-}
+import { sendChatMessage } from '../lib/api'
+import { ChatInterfaceProps, Message } from '../lib/types'
 
 export default function ChatInterface({ userId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([])
@@ -15,14 +12,14 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
   const [sessionId] = useState(() => uuidv4())
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
     const userMessage: Message = {
       id: uuidv4(),
       content: input.trim(),
-      role: 'user',
+      type: 'user',
       timestamp: new Date()
     }
 
@@ -32,17 +29,17 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
 
     try {
       const response = await sendChatMessage({
-        content: userMessage.content,
-        session_id: sessionId
+        message: userMessage.content,
+        session_id: sessionId,
+        userId
       })
 
       const assistantMessage: Message = {
         id: uuidv4(),
         content: response.response,
-        role: 'assistant',
+        type: 'assistant',
         timestamp: new Date(),
-        sources: response.sources,
-        agentUsed: response.agent_used
+        sources: response.sources
       }
 
       setMessages(prev => [...prev, assistantMessage])
@@ -52,9 +49,8 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       const errorMessage: Message = {
         id: uuidv4(),
         content: 'I apologize, but I encountered an error processing your request. Please try again.',
-        role: 'assistant',
-        timestamp: new Date(),
-        isError: true
+        type: 'assistant',
+        timestamp: new Date()
       }
 
       setMessages(prev => [...prev, errorMessage])
@@ -63,10 +59,10 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      handleSubmit(e as any)
     }
   }
 
@@ -78,13 +74,13 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[600px] flex flex-col">
+      <div className="bg-card rounded-lg shadow-sm border border-border h-[600px] flex flex-col">
         {/* Chat Header */}
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+        <div className="p-4 border-b border-border">
+          <h2 className="text-lg font-semibold text-card-foreground">
             Building Code Assistant
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Ask questions about Australian building codes and regulations
           </p>
         </div>
@@ -95,7 +91,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
         </div>
 
         {/* Input Form */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-border">
           <form onSubmit={handleSubmit} className="flex gap-2">
             <textarea
               ref={inputRef}
@@ -103,21 +99,21 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask about building codes, regulations, or requirements..."
-              className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               rows={2}
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               <PaperAirplaneIcon className="h-5 w-5" />
             </button>
           </form>
           
           {/* Tips */}
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="mt-2 text-xs text-muted-foreground">
             Press Enter to send, Shift+Enter for new line
           </div>
         </div>

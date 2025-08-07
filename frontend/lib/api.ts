@@ -1,44 +1,28 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-export interface Message {
-  id: string
-  content: string
-  role: 'user' | 'assistant'
-  timestamp: Date
-  sources?: Source[]
-  agentUsed?: string
-  isError?: boolean
-}
-
-export interface Source {
-  content: string
-  similarity_score: number
-  metadata: {
-    source?: string
-    clause_type?: string
-    section?: string
-    page_number?: number
-    document_id?: string
-  }
-}
-
 export interface ChatRequest {
-  content: string
+  message: string
   session_id?: string
+  userId?: string
 }
 
 export interface ChatResponse {
   response: string
   session_id: string
-  sources: Source[]
-  agent_used?: string
+  sources?: Array<{
+    title: string
+    content: string
+    url?: string
+  }>
 }
 
-export async function sendChatMessage(
-  request: ChatRequest,
-  accessToken?: string
-): Promise<ChatResponse> {
-  const headers: HeadersInit = {
+export interface HealthResponse {
+  status: string
+  timestamp: string
+}
+
+export async function sendChatMessage(request: ChatRequest, accessToken?: string): Promise<ChatResponse> {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
 
@@ -60,11 +44,8 @@ export async function sendChatMessage(
   return response.json()
 }
 
-export async function endChatSession(
-  sessionId: string,
-  accessToken?: string
-): Promise<void> {
-  const headers: HeadersInit = {}
+export async function endChatSession(sessionId: string, accessToken?: string): Promise<void> {
+  const headers: Record<string, string> = {}
 
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`
@@ -81,7 +62,7 @@ export async function endChatSession(
   }
 }
 
-export async function getHealthStatus(): Promise<any> {
+export async function getHealthStatus(): Promise<HealthResponse> {
   const response = await fetch(`${API_BASE_URL}/api/health`)
   
   if (!response.ok) {
