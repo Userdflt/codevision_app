@@ -44,3 +44,8 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/

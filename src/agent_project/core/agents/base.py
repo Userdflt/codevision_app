@@ -4,10 +4,10 @@ Base agent class for all AI agents in the system.
 
 from abc import ABC, abstractmethod
 from typing import Dict, Any, AsyncGenerator
+import inspect
 import structlog
 
 from agent_project.infrastructure.llm.client import LLMClient
-from agent_project.infrastructure.vector_db.client import VectorDBClient
 
 
 logger = structlog.get_logger()
@@ -24,7 +24,8 @@ class BaseAgent(ABC):
     def __init__(self, agent_type: str):
         self.agent_type = agent_type
         self.llm_client = LLMClient()
-        self.vector_client = VectorDBClient()
+        # Lazily initialize vector client to avoid optional dependency import at import-time
+        self.vector_client = None
         logger.info("Initialized agent", agent_type=agent_type)
     
     @abstractmethod
@@ -85,12 +86,29 @@ class BaseAgent(ABC):
             List of relevant documents with metadata
         """
         try:
-            results = await self.vector_client.similarity_search(
+            # Lazy import and initialize the vector DB client if not provided/mocked
+            if self.vector_client is None:
+                try:
+                    from agent_project.infrastructure.vector_db.client import VectorDBClient  # type: ignore
+                    self.vector_client = VectorDBClient()
+                except Exception as e:
+                    logger.error(
+                        "Failed to initialize vector client",
+                        agent_type=self.agent_type,
+                        error=str(e)
+                    )
+                    return []
+            # Default clause type to this agent's type if not provided
+            effective_clause_type = clause_type or self.agent_type
+
+            call_result = self.vector_client.similarity_search(
                 query=query,
-                clause_type=clause_type,
+                clause_type=effective_clause_type,
                 limit=limit,
                 similarity_threshold=similarity_threshold
             )
+
+            results = await call_result if inspect.isawaitable(call_result) else call_result
             
             logger.debug(
                 "Retrieved context",

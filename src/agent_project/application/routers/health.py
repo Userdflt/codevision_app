@@ -10,7 +10,6 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from agent_project.config import settings
-from agent_project.infrastructure.vector_db.client import VectorDBClient
 
 
 logger = structlog.get_logger()

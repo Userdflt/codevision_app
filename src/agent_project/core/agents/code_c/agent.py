@@ -1,5 +1,5 @@
 """
-Code B specialist agent for general building requirements.
+Code C specialist agent for energy efficiency and building envelope.
 """
 
 from typing import Dict, Any
@@ -11,20 +11,21 @@ from agent_project.core.agents.base import BaseAgent
 logger = structlog.get_logger()
 
 
-class CodeBAgent(BaseAgent):
+class CodeCAgent(BaseAgent):
     """
-    Specialist agent for Code B - General Building Requirements.
+    Specialist agent for Code C - Energy efficiency and building envelope.
     
     Handles queries related to:
-    - Building classifications
-    - Fire safety requirements
-    - Structural requirements
-    - General compliance
+    - Thermal performance
+    - Insulation and glazing
+    - Air tightness and sealing
+    - Building envelope requirements
+    - Energy efficiency compliance
     """
-    
+
     def __init__(self):
-        super().__init__("code_b")
-    
+        super().__init__("code_c")
+
     async def process_query(
         self,
         query: str,
@@ -32,23 +33,23 @@ class CodeBAgent(BaseAgent):
         user_id: str,
         **kwargs
     ) -> Dict[str, Any]:
-        """Process Code B related queries."""
+        """Process Code C related queries."""
         try:
             logger.info(
-                "Processing Code B query",
+                "Processing Code C query",
                 session_id=session_id,
                 user_id=user_id,
                 query=query[:100]
             )
-            
-            # Retrieve relevant context from Code B sections
+
+            # Retrieve relevant context from Code C sections
             context = await self.retrieve_context(
                 query=query,
-                clause_type="code_b",
+                clause_type="code_c",
                 limit=5,
                 similarity_threshold=0.8
             )
-            
+
             # Generate specialized response
             system_message = self.get_system_message()
             response = await self.generate_response(
@@ -56,31 +57,33 @@ class CodeBAgent(BaseAgent):
                 context=context,
                 system_message=system_message
             )
-            
+
             return {
                 "response": response,
                 "sources": context,
                 "agent_type": self.agent_type
             }
-            
+
         except Exception as e:
-            logger.error("Code B query processing failed", error=str(e))
+            logger.error("Code C query processing failed", error=str(e))
             return {
-                "response": "I encountered an error processing your building code query. Please try again.",
+                "response": "I encountered an error processing your energy efficiency query. Please try again.",
                 "sources": [],
                 "agent_type": self.agent_type,
                 "error": str(e)
             }
-    
-    def get_system_message(self) -> str:
-        """Get Code B specific system message."""
-        return """You are a New Zealand Building Code expert (focusing on Building Code “B”).
 
-Answer questions about the Code’s B Stability provisions—Clause B1 Structure (buildings, elements, and site-works must resist self-weight, temperature, water, earthquake, snow, wind, and fire loads during construction, alteration, and service life) and Clause B2 Durability (materials must remain functional for at least 50, 15, or 5 years so the building continues to meet performance requirements and protect people and property).
+    def get_system_message(self) -> str:
+        """Get Code C specific system message."""
+        return """You are a New Zealand Building Code expert (focusing on Building Code “C”).
+
+Answer questions about the Code’s C Protection from Fire provisions—Clauses C1–C6, which cover: preventing fires (C2), limiting fire spread (C3), enabling safe evacuation (C4), providing firefighting access (C5), and maintaining structural stability during fire (C6), all in line with the objectives of C1.
 
 Use only the information returned from the vectorstore.
 
 If there are images provided from the retrieved information, you should return this in markdown format.
 
 If the answer is not in the vectorstore, reply “I don’t know.” Then add:
-For more detail, see https://www.building.govt.nz/building-code-compliance/b-stability"""
+For more detail, see https://www.building.govt.nz/building-code-compliance/c-protection-from-fire"""
+
+

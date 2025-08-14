@@ -4,13 +4,11 @@ Orchestrator agent that analyzes intent and routes to appropriate specialists.
 
 from typing import Dict, Any, AsyncGenerator
 import structlog
-from langgraph import StateGraph, END
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 from pydantic import BaseModel
 
 from agent_project.core.agents.base import BaseAgent
 from agent_project.core.tools.intent_classifier import IntentClassifier
-from agent_project.infrastructure.vector_db.client import VectorDBClient
 
 
 logger = structlog.get_logger()
@@ -70,7 +68,8 @@ class OrchestratorAgent(BaseAgent):
         try:
             logger.info("Classifying query intent", query=state.query[:100])
             
-            intent = await self.intent_classifier.classify(state.query)
+            intent_result = self.intent_classifier.classify(state.query)
+            intent = await intent_result if hasattr(intent_result, "__await__") else intent_result
             
             logger.info("Intent classified", intent=intent)
             
@@ -146,13 +145,19 @@ class OrchestratorAgent(BaseAgent):
         try:
             logger.info("Handling general query")
             
-            # For general queries, perform basic vector search
-            vector_client = VectorDBClient()
-            results = await vector_client.similarity_search(
+            # For general queries, perform basic vector search. Use patched client if present
+            vector_client = getattr(self, "vector_client", None)
+            if vector_client is None:
+                # Lazy import to avoid optional dependency during initial import
+                from agent_project.infrastructure.vector_db.client import VectorDBClient
+                vector_client = VectorDBClient()
+
+            call_result = vector_client.similarity_search(
                 query=state.query,
                 limit=5,
                 similarity_threshold=0.7
             )
+            results = await call_result if hasattr(call_result, "__await__") else call_result
             
             # Generate response using retrieved context
             response = await self._generate_general_response(state.query, results)
@@ -169,10 +174,37 @@ class OrchestratorAgent(BaseAgent):
     
     async def _get_specialist_agent(self, specialist_type: str):
         """Dynamically import and instantiate specialist agent."""
-        # TODO: Implement dynamic agent loading
-        # For now, return a placeholder
-        from agent_project.core.agents.code_b.agent import CodeBAgent
-        return CodeBAgent()
+        try:
+            if specialist_type == "code_b":
+                from agent_project.core.agents.code_b.agent import CodeBAgent
+                return CodeBAgent()
+            if specialist_type == "code_c":
+                from agent_project.core.agents.code_c.agent import CodeCAgent
+                return CodeCAgent()
+            if specialist_type == "code_d":
+                from agent_project.core.agents.code_d.agent import CodeDAgent
+                return CodeDAgent()
+            if specialist_type == "code_e":
+                from agent_project.core.agents.code_e.agent import CodeEAgent
+                return CodeEAgent()
+            if specialist_type == "code_f":
+                from agent_project.core.agents.code_f.agent import CodeFAgent
+                return CodeFAgent()
+            if specialist_type == "code_g":
+                from agent_project.core.agents.code_g.agent import CodeGAgent
+                return CodeGAgent()
+            if specialist_type == "code_h":
+                from agent_project.core.agents.code_h.agent import CodeHAgent
+                return CodeHAgent()
+
+            # Default fallback
+            from agent_project.core.agents.code_b.agent import CodeBAgent
+            return CodeBAgent()
+        except Exception as e:
+            logger.error("Failed to load specialist agent", specialist_type=specialist_type, error=str(e))
+            # Fallback to Code B agent
+            from agent_project.core.agents.code_b.agent import CodeBAgent
+            return CodeBAgent()
     
     async def _generate_general_response(self, query: str, context: list) -> str:
         """Generate response for general queries using retrieved context."""
@@ -199,19 +231,25 @@ class OrchestratorAgent(BaseAgent):
             # Run the graph
             result = await self.graph.ainvoke(initial_state)
             
-            if result.error:
+            # result may be a BaseModel or dict-like; access safely
+            result_error = result.get("error") if hasattr(result, "get") else getattr(result, "error", None)
+            if result_error:
                 logger.error("Orchestrator processing failed", error=result.error)
                 return {
                     "response": "I encountered an error processing your query. Please try again.",
                     "sources": [],
                     "agent_used": "orchestrator",
-                    "error": result.error
+                    "error": result_error
                 }
-            
+
+            response_val = result.get("response") if hasattr(result, "get") else getattr(result, "response", None)
+            sources_val = result.get("sources") if hasattr(result, "get") else getattr(result, "sources", [])
+            specialist_val = result.get("specialist_agent") if hasattr(result, "get") else getattr(result, "specialist_agent", None)
+
             return {
-                "response": result.response,
-                "sources": result.sources,
-                "agent_used": result.specialist_agent or "orchestrator"
+                "response": response_val or "",
+                "sources": sources_val or [],
+                "agent_used": specialist_val or "orchestrator"
             }
             
         except Exception as e:

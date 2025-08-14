@@ -1,5 +1,5 @@
 """
-Code B specialist agent for general building requirements.
+Code D specialist agent for mechanical systems and ventilation.
 """
 
 from typing import Dict, Any
@@ -11,20 +11,21 @@ from agent_project.core.agents.base import BaseAgent
 logger = structlog.get_logger()
 
 
-class CodeBAgent(BaseAgent):
+class CodeDAgent(BaseAgent):
     """
-    Specialist agent for Code B - General Building Requirements.
+    Specialist agent for Code D - Mechanical systems and ventilation.
     
     Handles queries related to:
-    - Building classifications
-    - Fire safety requirements
-    - Structural requirements
-    - General compliance
+    - HVAC performance and design
+    - Ventilation and indoor air quality
+    - Smoke control and pressurisation
+    - Exhaust systems and ducting
+    - Commissioning and maintenance requirements
     """
-    
+
     def __init__(self):
-        super().__init__("code_b")
-    
+        super().__init__("code_d")
+
     async def process_query(
         self,
         query: str,
@@ -32,23 +33,23 @@ class CodeBAgent(BaseAgent):
         user_id: str,
         **kwargs
     ) -> Dict[str, Any]:
-        """Process Code B related queries."""
+        """Process Code D related queries."""
         try:
             logger.info(
-                "Processing Code B query",
+                "Processing Code D query",
                 session_id=session_id,
                 user_id=user_id,
                 query=query[:100]
             )
-            
-            # Retrieve relevant context from Code B sections
+
+            # Retrieve relevant context from Code D sections
             context = await self.retrieve_context(
                 query=query,
-                clause_type="code_b",
+                clause_type="code_d",
                 limit=5,
                 similarity_threshold=0.8
             )
-            
+
             # Generate specialized response
             system_message = self.get_system_message()
             response = await self.generate_response(
@@ -56,31 +57,33 @@ class CodeBAgent(BaseAgent):
                 context=context,
                 system_message=system_message
             )
-            
+
             return {
                 "response": response,
                 "sources": context,
                 "agent_type": self.agent_type
             }
-            
+
         except Exception as e:
-            logger.error("Code B query processing failed", error=str(e))
+            logger.error("Code D query processing failed", error=str(e))
             return {
-                "response": "I encountered an error processing your building code query. Please try again.",
+                "response": "I encountered an error processing your mechanical systems query. Please try again.",
                 "sources": [],
                 "agent_type": self.agent_type,
                 "error": str(e)
             }
-    
+
     def get_system_message(self) -> str:
-        """Get Code B specific system message."""
-        return """You are a New Zealand Building Code expert (focusing on Building Code “B”).
+        """Get Code D specific system message."""
+        return """You are a New Zealand Building Code expert (focusing on Building Code “D”).
 
-Answer questions about the Code’s B Stability provisions—Clause B1 Structure (buildings, elements, and site-works must resist self-weight, temperature, water, earthquake, snow, wind, and fire loads during construction, alteration, and service life) and Clause B2 Durability (materials must remain functional for at least 50, 15, or 5 years so the building continues to meet performance requirements and protect people and property).
+Answer questions about the Code’s D Access provisions—Clause D1 Access routes (safe entry, internal/external stairs, ramps, corridors, lifts; slip resistance; facilities for people with disabilities; vehicle movement, loading, parking) and Clause D2 Mechanical installations for access (lifts, escalators, moving walks must resist service loads, prevent accidents, and safeguard users and maintenance staff).
 
-Use only the information returned from the vectorstore.
+your goal is to provide an accurate answer based on this information ONLY.
 
 If there are images provided from the retrieved information, you should return this in markdown format.
 
 If the answer is not in the vectorstore, reply “I don’t know.” Then add:
-For more detail, see https://www.building.govt.nz/building-code-compliance/b-stability"""
+For more detail, see https://www.building.govt.nz/building-code-compliance/d-access"""
+
+

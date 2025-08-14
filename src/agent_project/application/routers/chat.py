@@ -12,7 +12,6 @@ from pydantic import BaseModel
 
 from agent_project.core.agents.orchestrator.agent import OrchestratorAgent
 from agent_project.infrastructure.auth.dependencies import get_current_user
-from agent_project.infrastructure.vector_db.client import VectorDBClient
 
 
 logger = structlog.get_logger()

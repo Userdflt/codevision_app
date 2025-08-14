@@ -4,11 +4,17 @@ Application configuration using Pydantic settings.
 
 from typing import Optional
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
     
     # Application
     app_name: str = "Code Vision Agent API"
@@ -53,10 +59,7 @@ class Settings(BaseSettings):
     enable_tracing: bool = Field(default=False, alias="ENABLE_TRACING")
     prometheus_port: int = Field(default=9090, alias="PROMETHEUS_PORT")
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    # Pydantic v2 settings are configured via model_config above
 
 
 # Global settings instance

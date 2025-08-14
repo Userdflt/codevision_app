@@ -55,10 +55,11 @@ class TestCodeBAgent:
         """Test Code B specific system message."""
         system_message = code_b_agent.get_system_message()
         
-        assert "Code B" in system_message
-        assert "building classifications" in system_message.lower()
-        assert "fire safety" in system_message.lower()
-        assert "structural" in system_message.lower()
+        assert "New Zealand Building Code" in system_message
+        assert "Building Code “B”" in system_message
+        assert "B1" in system_message or "Structure" in system_message
+        assert "B2" in system_message or "Durability" in system_message
+        assert "vectorstore" in system_message.lower()
     
     @pytest.mark.asyncio
     async def test_retrieve_context_filters(self, code_b_agent):

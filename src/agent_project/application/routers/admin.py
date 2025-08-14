@@ -10,7 +10,6 @@ from fastapi import APIRouter, HTTPException, Depends, status, Query
 from pydantic import BaseModel
 
 from agent_project.infrastructure.auth.dependencies import get_admin_user
-from agent_project.infrastructure.vector_db.client import VectorDBClient
 
 
 logger = structlog.get_logger()

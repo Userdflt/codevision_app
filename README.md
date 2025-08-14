@@ -114,12 +114,6 @@ The application auto-deploys on push to `main`:
 2. **Frontend**: Builds static export → deploys to Netlify
 3. **Infrastructure**: Terraform Cloud manages secrets and scaling
 
-## API Documentation
-
-Once running, visit:
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-- **Metrics**: http://localhost:8000/metrics
 
 ## Contributing
 
