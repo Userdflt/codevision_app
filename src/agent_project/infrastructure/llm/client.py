@@ -2,7 +2,7 @@
 LLM client for interfacing with various language model providers.
 """
 
-from typing import Optional, Dict, Any, AsyncGenerator
+from typing import Optional, Dict, AsyncGenerator
 import structlog
 from openai import AsyncOpenAI
 from anthropic import AsyncAnthropic

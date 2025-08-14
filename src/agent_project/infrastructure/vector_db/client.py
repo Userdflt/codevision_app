@@ -3,7 +3,6 @@ Supabase pgvector client for semantic search operations.
 """
 
 from typing import Dict, Any, List, Optional
-import asyncio
 import structlog
 from supabase import create_client, Client
 import asyncpg

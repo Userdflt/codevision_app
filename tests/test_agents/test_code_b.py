@@ -3,7 +3,7 @@ Tests for Code B specialist agent.
 """
 
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 from agent_project.core.agents.code_b.agent import CodeBAgent
 
