@@ -8,9 +8,9 @@ export default function Features() {
             <div className="@container mx-auto max-w-5xl px-6">
                 <div className="text-center">
                     <h2 className="text-balance text-4xl font-semibold lg:text-5xl">Why Choose Code Vision?</h2>
-                    <p className="mt-4 text-muted-foreground">Comprehensive building code assistance powered by advanced AI technology.</p>
+                    <p className="mt-4 text-muted-foreground">Comprehensive NZ Building Code assistance powered by advanced AI technology.</p>
                 </div>
-                <div className="@min-4xl:max-w-full @min-4xl:grid-cols-3 mx-auto mt-8 grid max-w-sm gap-6 [--color-background:var(--color-muted)] [--color-card:var(--color-muted)] *:text-center md:mt-16 dark:[--color-muted:var(--color-zinc-900)]">
+                <div className="mx-auto mt-8 grid max-w-5xl gap-6 grid-cols-1 md:grid-cols-3 items-stretch [--color-background:var(--color-muted)] [--color-card:var(--color-muted)] *:text-center md:mt-16 dark:[--color-muted:var(--color-zinc-900)]">
                     <Card className="group border-0 shadow-none">
                         <CardHeader className="pb-3">
                             <CardDecorator>
@@ -24,7 +24,7 @@ export default function Features() {
                         </CardHeader>
 
                         <CardContent>
-                            <p className="text-sm">Get immediate responses to complex building code questions. No more searching through hundreds of pages.</p>
+                            <p className="text-sm">Get immediate responses to complex NZBC questions. No more searching through hundreds of pages.</p>
                         </CardContent>
                     </Card>
 
@@ -41,7 +41,7 @@ export default function Features() {
                         </CardHeader>
 
                         <CardContent>
-                            <p className="mt-3 text-sm">Access the complete Building Code of Australia (BCA), fire safety standards, and structural requirements in one place.</p>
+                            <p className="mt-3 text-sm">Access NZBC Clauses B–H (B1/B2, C1–C6, D1/D2, E1–E3, F1–F9, G1–G15, H1) with source references in one place.</p>
                         </CardContent>
                     </Card>
 
@@ -58,7 +58,7 @@ export default function Features() {
                         </CardHeader>
 
                         <CardContent>
-                            <p className="mt-3 text-sm">Built on verified Australian building standards with source references for every answer you receive.</p>
+                            <p className="mt-3 text-sm">Built on verified New Zealand standards and guidance with source references for every answer.</p>
                         </CardContent>
                     </Card>
                 </div>

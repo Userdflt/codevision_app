@@ -51,7 +51,7 @@ export default function Home() {
       <>
         <Head>
           <title>Code Vision - AI Building Code Assistant</title>
-          <meta name="description" content="AI-powered assistant for Australian building codes and regulations" />
+          <meta name="description" content="AI-powered assistant for the New Zealand Building Code (NZBC) and regulations" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
@@ -100,7 +100,7 @@ export default function Home() {
     <>
       <Head>
         <title>Code Vision - AI Building Code Assistant</title>
-        <meta name="description" content="AI-powered assistant for Australian building codes and regulations" />
+        <meta name="description" content="AI-powered assistant for the New Zealand Building Code (NZBC) and regulations" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -119,11 +119,10 @@ export default function Home() {
         <section className="py-16 bg-muted/50">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              Ready to streamline your building code compliance?
+              Ready to streamline your NZ Building Code compliance?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get instant answers to complex building code questions with our AI-powered assistant. 
-              From fire safety requirements to structural specifications.
+              Get instant answers to complex NZBC questions with our AI assistant — from fire protection to structure, durability, moisture, safety of users, services and facilities, and energy efficiency.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

@@ -19,14 +19,14 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
           <div className="mb-8 flex justify-center">
             <div className="flex items-center gap-3">
               <LogoIcon />
-              <span className="text-2xl font-bold text-foreground">Code Vision</span>
+              <span className="text-2xl font-bold text-foreground">CodeVision</span>
             </div>
           </div>
           
           {/* Main heading */}
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl leading-[1.15]">
             <span className="block">AI-Powered</span>
-            <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent pb-1 md:pb-2">
               Building Code
             </span>
             <span className="block">Assistant</span>
@@ -34,28 +34,40 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
           
           {/* Subtitle */}
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground md:text-xl">
-            Get instant, accurate answers to complex Australian building code questions. 
-            From fire safety requirements to structural specifications, our AI assistant 
-            helps you navigate regulations with confidence.
+            Get instant, accurate answers to complex New Zealand Building Code (NZBC) questions.
+            From Protection from Fire to Structure and Durability, our AI assistant
+            helps you navigate NZ regulations with confidence.
           </p>
           
           {/* Features list */}
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary" />
-              Building Code of Australia (BCA)
+              B Structure & Durability
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary" />
-              Fire Safety Requirements
+              C Protection from Fire
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary" />
-              Structural Specifications
+              D Access
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary" />
-              Accessibility Standards
+              E Moisture
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              F Safety of Users
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              G Services
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              H1 Energy
             </div>
           </div>
           
