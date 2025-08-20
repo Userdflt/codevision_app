@@ -1,15 +1,5 @@
-# Multi-stage build for FastAPI backend and Next.js frontend
-FROM node:18-alpine AS frontend-builder
-
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm ci --only=production
-
-COPY frontend/ ./
-RUN npm run build && npm run export
-
-# Python backend stage
-FROM python:3.12-slim AS backend
+# Python backend for Google Cloud Run
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -32,8 +22,7 @@ RUN poetry config virtualenvs.create false \
 # Copy source code
 COPY src/ ./src/
 
-# Copy frontend build from previous stage
-COPY --from=frontend-builder /app/frontend/out ./static/
+# Frontend is now deployed separately to Firebase Hosting
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash agent

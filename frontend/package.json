@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next export",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "firebase:deploy": "firebase deploy --only hosting",
+    "firebase:serve": "firebase serve --only hosting"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.0",
@@ -42,7 +43,7 @@
     "react-dom": "^18.3.0",
     "react-hook-form": "^7.45.4",
     "react-markdown": "^9.0.1",
-    "react-syntax-highlighter": "^15.6.1",
+    "react-syntax-highlighter": "^5.8.0",
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "^3.4.0",
@@ -57,6 +58,7 @@
     "@types/uuid": "^9.0.3",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.0.0",
+    "firebase-tools": "^13.0.0",
     "typescript": "^5.2.2"
   }
 }

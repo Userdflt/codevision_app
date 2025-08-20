@@ -49,3 +49,7 @@ logs/
 .coverage
 coverage.xml
 htmlcov/
+
+# Guides
+LOCAL_DEPLOYMENT_GUIDE.md
+DEPLOYMENT_GUIDE.md

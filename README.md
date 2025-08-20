@@ -8,9 +8,10 @@ This application consists of:
 
 - **FastAPI + LangGraph Backend**: Orchestration agent with specialist clause agents (B-H)
 - **Next.js Frontend**: Static chat UI with Supabase Auth
-- **Supabase pgvector**: Vector database for clause embeddings
-- **Fly.io Deployment**: Auto-scaling Python API service
-- **Netlify Deployment**: Global CDN for frontend
+- **Supabase pgvector**: Vector database for clause embeddings  
+- **Google Cloud Run**: Auto-scaling Python API service (australia-southeast1)
+- **Firebase Hosting**: Global CDN for frontend static site
+- **Ephemeral Chat Memory**: Session-based message storage with automatic cleanup
 
 ## Quick Start
 
@@ -66,7 +67,7 @@ make docker-run
 
 ## Project Structure
 
-```
+``` text
 ├── .github/workflows/     # CI/CD pipeline
 ├── src/agent_project/     # Python backend
 │   ├── application/       # FastAPI routers & DI
@@ -104,16 +105,39 @@ ANTHROPIC_API_KEY=your_anthropic_key
 APP_ENV=development
 LOG_LEVEL=INFO
 API_VERSION=v1
-```
+
+# Security
+JWT_SECRET_KEY=your_jwt_secret_key_for_development
+
+# Google Cloud Configuration
+GCP_PROJECT_ID=your-gcp-project-id
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+
+# Session Memory Configuration
+SESSION_EXPIRY_HOURS=24
+MAX_SESSION_MESSAGES=100
+
+# Firebase Configuration  
+FIREBASE_PROJECT_ID=your-firebase-project-id
 
 ## Deployment
 
 The application auto-deploys on push to `main`:
 
-1. **Backend**: Builds Docker image → pushes to GHCR → deploys to Fly.io
-2. **Frontend**: Builds static export → deploys to Netlify
-3. **Infrastructure**: Terraform Cloud manages secrets and scaling
+1. **Backend**: Builds Docker image → pushes to Google Artifact Registry → deploys to Cloud Run
+2. **Frontend**: Builds static export → deploys to Firebase Hosting  
+3. **Infrastructure**: Google Secret Manager stores secrets, Cloud Run auto-scales containers
 
+### Manual Deployment Commands
+
+```bash
+# Backend to Google Cloud Run
+export PROJECT_ID=your-gcp-project-id
+make gcp-build gcp-deploy
+
+# Frontend to Firebase Hosting  
+make frontend-build firebase-deploy
+```
 
 ## Contributing
 

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+// Removed syntax highlighter styling for compatibility
 import LoadingIndicator from './LoadingIndicator'
 import SourceCard from './SourceCard'
 import { MessageListProps } from '../lib/types'
@@ -24,7 +24,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
         <div className="text-center">
           <p className="text-lg mb-2">Welcome to Code Vision!</p>
           <p className="text-sm">
-            Ask me anything about Australian building codes and regulations.
+            Ask me anything about New Zealand building codes and regulations.
           </p>
           <div className="mt-4 text-xs space-y-1">
             <p>Try asking:</p>
@@ -64,7 +64,12 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
                         const match = /language-(\w+)/.exec(className || '')
                         return !inline && match ? (
                           <SyntaxHighlighter
-                            style={oneDark}
+                            customStyle={{
+                              backgroundColor: '#f6f8fa',
+                              border: '1px solid #e1e4e8',
+                              borderRadius: '6px',
+                              padding: '16px'
+                            }}
                             language={match[1]}
                             PreTag="div"
                             className="rounded-md"

@@ -49,8 +49,16 @@ class Settings(BaseSettings):
     agent_timeout_seconds: int = Field(default=30, alias="AGENT_TIMEOUT_SECONDS")
     enable_parallel_agents: bool = Field(default=True, alias="ENABLE_PARALLEL_AGENTS")
     
-    # Security
-    jwt_secret_key: str = Field(alias="JWT_SECRET_KEY", default="dev-secret-key")
+    # Session Memory Configuration
+    session_expiry_hours: int = Field(default=24, alias="SESSION_EXPIRY_HOURS")
+    max_session_messages: int = Field(default=100, alias="MAX_SESSION_MESSAGES")
+    
+    # Google Cloud Configuration
+    gcp_project_id: Optional[str] = Field(default=None, alias="GCP_PROJECT_ID")
+    google_application_credentials: Optional[str] = Field(default=None, alias="GOOGLE_APPLICATION_CREDENTIALS")
+    
+    # Security Configuration
+    jwt_secret_key: str = Field(alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     jwt_expiration_hours: int = Field(default=24, alias="JWT_EXPIRATION_HOURS")
     

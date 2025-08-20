@@ -81,7 +81,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
             Building Code Assistant
           </h2>
           <p className="text-sm text-muted-foreground">
-            Ask questions about Australian building codes and regulations
+            Ask questions about New Zealand building codes and regulations
           </p>
         </div>
 
