@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { Session } from '@supabase/supabase-js'
 import ChatInterface from '../components/ChatInterface'
 import AuthModal from '../components/AuthModal'
@@ -11,16 +12,23 @@ import { useSupabase } from './_app'
 import { Button } from '@/components/ui/button'
 
 export default function Home() {
+  const router = useRouter()
   const { supabase } = useSupabase()
   const [session, setSession] = useState<Session | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
+    // Don't auto-check session if we're on reset-password route
+    if (router.pathname === '/reset-password') {
+      console.log('Skipping session check on reset-password route')
+      return
+    }
+  
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
-
+  
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -29,9 +37,9 @@ export default function Home() {
         setShowChat(true)
       }
     })
-
+  
     return () => subscription.unsubscribe()
-  }, [supabase])
+  }, [supabase, router.pathname]) // Add router.pathname to dependencies
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()

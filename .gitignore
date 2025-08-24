@@ -53,3 +53,6 @@ htmlcov/
 # Guides
 LOCAL_DEPLOYMENT_GUIDE.md
 DEPLOYMENT_GUIDE.md
+
+# Not in use (anything with NIU in the name)
+NIU_*

@@ -48,13 +48,46 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
+        options: { redirectTo: window.location.origin }
       })
       if (error) throw error
     } catch (error: any) {
       setMessage(error.message)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setMessage('Please enter your email to reset your password')
+      return
+    }
+    
+    setIsLoading(true)
+    setMessage('Checking account...')
+    
+    try {
+      const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password/`
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+      
+      if (error) {
+        // Check if it's because the user has no password (OAuth account)
+        if (error.message.includes('User not found') || 
+            error.message.includes('not found') ||
+            error.message.includes('Invalid email')) {
+          setMessage('This email might be associated with a Google account. Try signing in with Google instead, or check if you used a different email address.')
+        } else if (error.message.includes('Email rate limit exceeded')) {
+          setMessage('Too many reset attempts. Please wait a few minutes before trying again.')
+        } else {
+          setMessage(error.message)
+        }
+      } else {
+        setMessage('Password reset email sent! Check your inbox and follow the link to reset your password.')
+      }
+    } catch (error: any) {
+      console.error('Reset password error:', error)
+      setMessage('If this email has a password, you should receive a reset link. If you signed up with Google, please use the "Continue with Google" button instead.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -102,6 +135,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       variant="link"
                       size="sm"
                       className="h-auto p-0 text-xs"
+                      onClick={handleForgotPassword}
+                      disabled={isLoading}
                     >
                       Forgot password?
                     </Button>
