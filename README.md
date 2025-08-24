@@ -138,10 +138,3 @@ make gcp-build gcp-deploy
 # Frontend to Firebase Hosting  
 make frontend-build firebase-deploy
 ```
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linting: `make test lint`
-4. Submit a pull request
