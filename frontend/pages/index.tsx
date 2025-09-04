@@ -19,9 +19,9 @@ export default function Home() {
   const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
-    // Don't auto-check session if we're on reset-password route
-    if (router.pathname === '/reset-password') {
-      console.log('Skipping session check on reset-password route')
+    // Don't auto-check session if we're on auth-related routes
+    if (router.pathname === '/reset-password' || router.pathname === '/confirm-email') {
+      console.log('Skipping session check on auth route:', router.pathname)
       return
     }
   

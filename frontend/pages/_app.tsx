@@ -28,11 +28,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // Prevent automatic session checking on reset-password page
   useEffect(() => {
-    if (router.pathname === '/reset-password') {
-      console.log('Skipping auto session check on reset-password page')
-      return // Don't auto-check session on reset page
+    if (router.pathname === '/reset-password' || router.pathname === '/confirm-email') {
+      console.log('Skipping auto session check on auth-related page:', router.pathname)
+      return // Don't auto-check session on auth pages
     }
-
     // Auto-check session for other pages
     const checkSession = async () => {
       try {

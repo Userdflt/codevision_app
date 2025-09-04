@@ -2,6 +2,6 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/reset-password": "pages/reset-password.js",
+  "/confirm-email": "pages/confirm-email.js",
   "/": "pages/index.js"
 }
