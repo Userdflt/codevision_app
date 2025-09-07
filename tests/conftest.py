@@ -2,11 +2,11 @@
 Pytest configuration and shared fixtures.
 """
 
-import pytest
 import asyncio
-from typing import Generator, AsyncGenerator
-from unittest.mock import Mock, AsyncMock
+from typing import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, Mock
 
+import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
@@ -53,8 +53,8 @@ def mock_vector_client():
                 "source": "NCC 2022",
                 "clause_type": "code_b",
                 "section": "B1.2",
-                "page_number": 123
-            }
+                "page_number": 123,
+            },
         }
     ]
     mock_client.health_check.return_value = True
@@ -67,7 +67,10 @@ def mock_llm_client():
     """Mock LLM client."""
     mock_client = AsyncMock()
     mock_client.generate.return_value = "Test response from LLM"
-    mock_client.get_available_providers.return_value = {"openai": True, "anthropic": False}
+    mock_client.get_available_providers.return_value = {
+        "openai": True,
+        "anthropic": False,
+    }
     return mock_client
 
 
@@ -79,7 +82,7 @@ def mock_user():
         "email": "test@example.com",
         "role": "user",
         "aud": "authenticated",
-        "exp": 1234567890
+        "exp": 1234567890,
     }
 
 
@@ -91,7 +94,7 @@ def mock_admin_user():
         "email": "admin@example.com",
         "role": "admin",
         "aud": "authenticated",
-        "exp": 1234567890
+        "exp": 1234567890,
     }
 
 
@@ -112,7 +115,7 @@ def sample_chat_message():
     """Sample chat message for testing."""
     return {
         "content": "What is the minimum R-value for Zone 3 walls?",
-        "session_id": "test-session-123"
+        "session_id": "test-session-123",
     }
 
 
@@ -128,20 +131,20 @@ def sample_vector_search_results():
                 "clause_type": "code_c",
                 "section": "J1.5",
                 "page_number": 245,
-                "document_id": "ncc-2022-vol2"
-            }
+                "document_id": "ncc-2022-vol2",
+            },
         },
         {
             "content": "Climate Zone 3 covers areas with moderate heating and cooling requirements...",
             "similarity_score": 0.88,
             "metadata": {
                 "source": "NCC 2022 Volume Two",
-                "clause_type": "code_c", 
+                "clause_type": "code_c",
                 "section": "J0.1",
                 "page_number": 201,
-                "document_id": "ncc-2022-vol2"
-            }
-        }
+                "document_id": "ncc-2022-vol2",
+            },
+        },
     ]
 
 

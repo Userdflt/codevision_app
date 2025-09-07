@@ -3,7 +3,7 @@ Health check and system status endpoints.
 """
 
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
 
 import structlog
 from fastapi import APIRouter, HTTPException, status
@@ -12,13 +12,13 @@ from pydantic import BaseModel
 from agent_project.config import settings
 from agent_project.infrastructure.vector_db.client import VectorDBClient
 
-
 logger = structlog.get_logger()
 router = APIRouter()
 
 
 class HealthResponse(BaseModel):
     """Health check response model."""
+
     status: str
     timestamp: datetime
     version: str
@@ -31,7 +31,7 @@ async def health_check() -> HealthResponse:
     Basic health check endpoint.
     """
     services = {}
-    
+
     # Check vector database connection
     try:
         vector_client = VectorDBClient()
@@ -40,7 +40,7 @@ async def health_check() -> HealthResponse:
     except Exception as e:
         logger.warning("Vector DB health check failed", error=str(e))
         services["vector_db"] = "unhealthy"
-    
+
     # Check LLM provider availability
     try:
         # TODO: Implement LLM provider health check
@@ -48,17 +48,19 @@ async def health_check() -> HealthResponse:
     except Exception as e:
         logger.warning("LLM provider health check failed", error=str(e))
         services["llm_provider"] = "unhealthy"
-    
+
     # Determine overall status
-    overall_status = "healthy" if all(
-        status == "healthy" for status in services.values()
-    ) else "degraded"
-    
+    overall_status = (
+        "healthy"
+        if all(status == "healthy" for status in services.values())
+        else "degraded"
+    )
+
     return HealthResponse(
         status=overall_status,
         timestamp=datetime.utcnow(),
         version=settings.app_version,
-        services=services
+        services=services,
     )
 
 
@@ -82,44 +84,44 @@ async def detailed_health_check() -> Dict[str, Any]:
                 "vector_similarity_threshold": settings.vector_similarity_threshold,
                 "default_llm_provider": settings.default_llm_provider,
                 "enable_parallel_agents": settings.enable_parallel_agents,
-            }
+            },
         }
-        
+
         # Detailed vector DB check
         try:
             vector_client = VectorDBClient()
             db_info = await vector_client.get_database_info()
             health_data["services"]["vector_db"] = {
                 "status": "healthy",
-                "details": db_info
+                "details": db_info,
             }
         except Exception as e:
             health_data["services"]["vector_db"] = {
                 "status": "unhealthy",
-                "details": {"error": str(e)}
+                "details": {"error": str(e)},
             }
-        
+
         # Check if any critical services are down
         critical_services = ["vector_db"]
         unhealthy_critical = [
-            service for service in critical_services
+            service
+            for service in critical_services
             if health_data["services"][service]["status"] != "healthy"
         ]
-        
+
         if unhealthy_critical:
             health_data["status"] = "unhealthy"
             raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=health_data
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=health_data
             )
-        
+
         return health_data
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error("Detailed health check failed", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Health check failed"
+            detail="Health check failed",
         )

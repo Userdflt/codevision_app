@@ -14,6 +14,11 @@ __pycache__/
 *.pyd
 .Python
 
+# Virtual environment - incase of using pip instead of poetry
+.venv/
+# Test tomls
+pyproject_test.toml
+
 # IDE
 .vscode/
 .cursor/

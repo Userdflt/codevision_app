@@ -3,30 +3,82 @@
 help:  ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-install:  ## Install dependencies
+install:  ## Install dependencies using Poetry (fixed encoding issues!)
+	@echo "🚀 Installing dependencies with Poetry..."
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && \
+	export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && \
 	poetry install
+	@echo "✅ Installation complete! Poetry virtual environment ready!"
+
+install-pip:  ## Install dependencies using pip (backup method)
+	@echo "📦 Installing dependencies with pip (backup method)..."
+	@if [ ! -d ".venv" ]; then \
+		echo "Creating new virtual environment..."; \
+		python3.12 -m venv .venv; \
+	fi
+	@echo "Installing dependencies..."
+	@.venv/bin/pip install --upgrade pip
+	@.venv/bin/pip install fastapi "uvicorn[standard]" langgraph langchain langchain-openai langchain-anthropic langchain-core supabase psycopg2-binary asyncpg pgvector pydantic pydantic-settings "python-jose[cryptography]" python-multipart jinja2 prometheus-client structlog
+	@.venv/bin/pip install pytest pytest-asyncio pytest-cov black isort flake8 mypy httpx
+	@echo "✅ Installation complete! Virtual environment ready at .venv/"
 
 lint:  ## Run linting (flake8, mypy)
-	poetry run flake8 src/ tests/
-	poetry run mypy src/
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run flake8 src/ tests/
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run mypy src/
 
 format:  ## Format code with black and isort
-	poetry run black src/ tests/
-	poetry run isort src/ tests/
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run black src/ tests/
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run isort src/ tests/
 
 test:  ## Run tests with coverage
-	poetry run pytest
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run pytest
 
-clean:  ## Clean build artifacts
+clean:  ## Clean build artifacts and virtual environment
 	find . -type d -name __pycache__ -delete
 	find . -type f -name "*.pyc" -delete
 	rm -rf .coverage htmlcov/ .pytest_cache/
 
+clean-full:  ## Clean everything including virtual environment
+	find . -type d -name __pycache__ -delete
+	find . -type f -name "*.pyc" -delete
+	rm -rf .coverage htmlcov/ .pytest_cache/ .venv
+	poetry cache clear --all pypi 2>/dev/null || true
+
+reset-env:  ## Reset virtual environment completely
+	@echo "Resetting virtual environment..."
+	rm -rf .venv
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry env remove --all 2>/dev/null || true
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry cache clear --all pypi 2>/dev/null || true
+	$(MAKE) install
+
+clear-poetry-cache:  ## Clear all Poetry caches
+	@echo "Clearing Poetry caches..."
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry cache clear --all pypi 2>/dev/null || true
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry cache clear --all PyPI 2>/dev/null || true
+	rm -rf ~/.cache/pypoetry 2>/dev/null || true
+	rm -rf ~/Library/Caches/pypoetry 2>/dev/null || true
+	@echo "✅ Poetry caches cleared!"
+
+fix-poetry:  ## Reset Poetry configuration and reinstall
+	@echo "🔧 Resetting Poetry configuration..."
+	$(MAKE) clear-poetry-cache
+	rm -rf .venv
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry env remove --all 2>/dev/null || true
+	@echo "Configuring Poetry to use global virtual environments..."
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && \
+	export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && \
+	poetry config virtualenvs.in-project false && \
+	poetry config virtualenvs.create true
+	@echo "Installing dependencies with Poetry..."
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && \
+	export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && poetry install --verbose
+	@echo "✅ Poetry reset complete!"
+
 run:  ## Run the FastAPI server
-	poetry run uvicorn agent_project.application.main:app --reload --host 0.0.0.0 --port 8000
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run uvicorn agent_project.application.main:app --reload --host 0.0.0.0 --port 8000
 
 dev:  ## Run in development mode with hot reload
-	poetry run uvicorn agent_project.application.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
+	@export PATH="/Users/youngwoosong/.local/bin:$PATH" && poetry run uvicorn agent_project.application.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
 
 docker-build:  ## Build Docker image for Cloud Run
 	docker build -t code-vision-api .

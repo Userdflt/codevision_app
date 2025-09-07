@@ -2,11 +2,11 @@
 Code D specialist agent for mechanical systems and ventilation.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 import structlog
 
 from agent_project.core.agents.base import BaseAgent
-
 
 logger = structlog.get_logger()
 
@@ -14,7 +14,7 @@ logger = structlog.get_logger()
 class CodeDAgent(BaseAgent):
     """
     Specialist agent for Code D - Mechanical systems and ventilation.
-    
+
     Handles queries related to:
     - HVAC performance and design
     - Ventilation and indoor air quality
@@ -27,11 +27,7 @@ class CodeDAgent(BaseAgent):
         super().__init__("code_d")
 
     async def process_query(
-        self,
-        query: str,
-        session_id: str,
-        user_id: str,
-        **kwargs
+        self, query: str, session_id: str, user_id: str, **kwargs
     ) -> Dict[str, Any]:
         """Process Code D related queries."""
         try:
@@ -39,29 +35,24 @@ class CodeDAgent(BaseAgent):
                 "Processing Code D query",
                 session_id=session_id,
                 user_id=user_id,
-                query=query[:100]
+                query=query[:100],
             )
 
             # Retrieve relevant context from Code D sections
             context = await self.retrieve_context(
-                query=query,
-                clause_type="code_d",
-                limit=5,
-                similarity_threshold=0.8
+                query=query, clause_type="code_d", limit=5, similarity_threshold=0.8
             )
 
             # Generate specialized response
             system_message = self.get_system_message()
             response = await self.generate_response(
-                prompt=query,
-                context=context,
-                system_message=system_message
+                prompt=query, context=context, system_message=system_message
             )
 
             return {
                 "response": response,
                 "sources": context,
-                "agent_type": self.agent_type
+                "agent_type": self.agent_type,
             }
 
         except Exception as e:
@@ -70,7 +61,7 @@ class CodeDAgent(BaseAgent):
                 "response": "I encountered an error processing your mechanical systems query. Please try again.",
                 "sources": [],
                 "agent_type": self.agent_type,
-                "error": str(e)
+                "error": str(e),
             }
 
     def get_system_message(self) -> str:
@@ -85,5 +76,3 @@ If there are images provided from the retrieved information, you should return t
 
 If the answer is not in the vectorstore, reply “I don’t know.” Then add:
 For more detail, see https://www.building.govt.nz/building-code-compliance/d-access"""
-
-
