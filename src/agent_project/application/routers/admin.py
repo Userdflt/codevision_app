@@ -2,7 +2,7 @@
 Admin endpoints for system management and debugging.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 import structlog
@@ -17,7 +17,8 @@ router = APIRouter()
 
 
 class VectorSearchRequest(BaseModel):
-    """Vector search request for debugging."""
+    """Vector search request for debugging.
+    test vector db for seach functionality"""
 
     query: str
     limit: int = 10
@@ -86,7 +87,7 @@ async def get_database_stats(
         vector_client = VectorDBClient()
         stats = await vector_client.get_database_stats()
 
-        return {"timestamp": datetime.utcnow().isoformat(), "statistics": stats}
+        return {"timestamp": datetime.now(timezone.UTC).isoformat(), "statistics": stats}
 
     except Exception as e:
         logger.error("Failed to get database stats", error=str(e))
@@ -121,7 +122,7 @@ async def cleanup_expired_sessions(
             "message": "Session cleanup completed",
             "sessions_cleaned": cleaned_count,
             "older_than_hours": older_than_hours,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.UTC).isoformat(),
         }
 
     except Exception as e:
@@ -171,7 +172,7 @@ async def test_agent(
             "agent_type": agent_type,
             "query": query,
             "test_result": "Test completed successfully",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.UTC).isoformat(),
         }
 
     except HTTPException:

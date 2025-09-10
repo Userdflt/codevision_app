@@ -2,7 +2,7 @@
 Health check and system status endpoints.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 import structlog
@@ -58,7 +58,7 @@ async def health_check() -> HealthResponse:
 
     return HealthResponse(
         status=overall_status,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.UTC),
         version=settings.app_version,
         services=services,
     )
@@ -72,7 +72,7 @@ async def detailed_health_check() -> Dict[str, Any]:
     try:
         health_data = {
             "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.UTC).isoformat(),
             "version": settings.app_version,
             "environment": settings.app_env,
             "services": {

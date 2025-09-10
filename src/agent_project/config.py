@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, alias="PORT")
     workers: int = Field(default=1, alias="WORKERS")
 
-    # Supabase
+    # Supabase Configuration (Primary Authentication)
     supabase_url: str = Field(alias="SUPABASE_URL")
     supabase_anon_key: str = Field(alias="SUPABASE_ANON_KEY")
     supabase_service_role_key: str = Field(alias="SUPABASE_SERVICE_ROLE_KEY")
@@ -63,10 +63,16 @@ class Settings(BaseSettings):
         default=None, alias="GOOGLE_APPLICATION_CREDENTIALS"
     )
 
-    # Security Configuration
-    jwt_secret_key: str = Field(alias="JWT_SECRET_KEY")
+    # Authentication Configuration
+    # Primary: Supabase JWT with ES256/RS256 (configured above)
+    # Fallback: Simple JWT for development/testing only
+    jwt_secret_key: Optional[str] = Field(default=None, alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     jwt_expiration_hours: int = Field(default=24, alias="JWT_EXPIRATION_HOURS")
+    
+    # JWT Cache Configuration
+    jwks_cache_ttl_seconds: int = Field(default=3600, alias="JWKS_CACHE_TTL_SECONDS")  # 1 hour
+    jwt_validation_timeout_seconds: int = Field(default=10, alias="JWT_VALIDATION_TIMEOUT_SECONDS")
 
     # Observability
     enable_metrics: bool = Field(default=True, alias="ENABLE_METRICS")

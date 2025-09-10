@@ -29,11 +29,20 @@ export async function sendChatMessage(request: ChatRequest, accessToken?: string
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`
   }
+  // Updating the request to match backend API expectations
+  const backendRequest = {
+    content: request.message,
+    session_id: request.session_id,
+    // NOTE: userId is handled by the JWT token and not in the request body.
+  }
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
+  // Remove trailing slashes from the API base URL
+  const url = `${API_BASE_URL}/api/v1/chat`.replace(/\/+$/, '')
+
+  const response = await fetch(url, {
     method: 'POST',
     headers,
-    body: JSON.stringify(request),
+    body: JSON.stringify(backendRequest),
   })
 
   if (!response.ok) {
