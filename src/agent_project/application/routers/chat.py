@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from agent_project.core.agents.orchestrator.agent import OrchestratorAgent
+from agent_project.agents.pure_orchestrator import PureSDKOrchestrator
 from agent_project.infrastructure.auth.dependencies import get_current_user
 
 logger = structlog.get_logger()
@@ -53,21 +53,23 @@ async def chat_endpoint(
             content_length=len(message.content),
         )
 
-        # Initialize orchestrator agent
-        orchestrator = OrchestratorAgent()
+        # Initialize pure SDK orchestrator (100% native OpenAI Agents SDK)
+        orchestrator = PureSDKOrchestrator()
 
-        # Process the message
-        result = await orchestrator.process_query(
-            query=message.content,
-            session_id=session_id,
-            user_id=current_user.get("sub"),
-        )
+        # Prepare context for pure SDK orchestration
+        context = {
+            "session_id": session_id,
+            "user_id": current_user.get("sub"),
+        }
+
+        # Process the message through pure SDK orchestrator
+        result = await orchestrator.process_query(message.content, context)
 
         return ChatResponse(
-            response=result["response"],
+            response=result.get("final_output", ""),
             session_id=session_id,
             sources=result.get("sources", []),
-            agent_used=result.get("agent_used"),
+            agent_used=result.get("last_agent"),
         )
 
     except Exception as e:
@@ -94,15 +96,20 @@ async def chat_stream_endpoint(
             session_id=session_id,
         )
 
-        orchestrator = OrchestratorAgent()
+        orchestrator = PureSDKOrchestrator()
 
         async def generate_response():
-            async for chunk in orchestrator.stream_query(
-                query=message.content,
-                session_id=session_id,
-                user_id=current_user.get("sub"),
-            ):
-                yield f"data: {chunk}\n\n"
+            context = {
+                "session_id": session_id,
+                "user_id": current_user.get("sub"),
+            }
+            
+            # Use stream_query method (currently uses normal processing)
+            result = await orchestrator.stream_query(message.content, context)
+            
+            # Extract the response text for streaming
+            response_text = result.get("final_output", "")
+            yield f"data: {response_text}\n\n"
 
         return StreamingResponse(
             generate_response(),
