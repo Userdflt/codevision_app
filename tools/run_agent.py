@@ -13,15 +13,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from agent_project.agents.pure_orchestrator import PureSDKOrchestrator
 from agent_project.agents.advanced import AdvancedOrchestrator
-from agent_project.core.agents.code_b.agent import CodeBAgent
 from agent_project.core.utils.logging import setup_logging
 
 
 AVAILABLE_AGENTS = {
     "pure_sdk": PureSDKOrchestrator,
     "advanced": AdvancedOrchestrator,
-    "code_b": CodeBAgent,
-    # Pure SDK migration complete - legacy orchestrators removed
+    # Pure SDK migration complete - all legacy components removed
+    # Use 'pure_sdk' for production or 'advanced' for full features
 }
 
 

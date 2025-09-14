@@ -18,7 +18,7 @@ install-pip:  ## Install dependencies using pip (backup method)
 	fi
 	@echo "Installing dependencies..."
 	@.venv/bin/pip install --upgrade pip
-	@.venv/bin/pip install fastapi "uvicorn[standard]" langgraph langchain langchain-openai langchain-anthropic langchain-core supabase psycopg2-binary asyncpg pgvector pydantic pydantic-settings "python-jose[cryptography]" python-multipart jinja2 prometheus-client structlog
+	@.venv/bin/pip install fastapi "uvicorn[standard]" openai-agents openai supabase psycopg2-binary asyncpg pgvector pydantic pydantic-settings "python-jose[cryptography]" python-multipart jinja2 prometheus-client structlog
 	@.venv/bin/pip install pytest pytest-asyncio pytest-cov black isort flake8 mypy httpx
 	@echo "✅ Installation complete! Virtual environment ready at .venv/"
 

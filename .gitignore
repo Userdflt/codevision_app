@@ -21,7 +21,6 @@ pyproject_test.toml
 
 # IDE
 .vscode/
-.cursor/
 *.swp
 *.swo
 
@@ -61,3 +60,17 @@ DEPLOYMENT_GUIDE.md
 
 # Not in use (anything with NIU in the name)
 NIU_*
+
+# Frontend build artifacts
+frontend/out/
+frontend/.next/
+frontend/node_modules/
+
+# Python artifacts
+*.egg-info/
+
+# Test artifacts
+.pytest_cache/
+
+# cursor
+.cursor/
