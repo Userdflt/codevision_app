@@ -122,7 +122,7 @@ async def cleanup_expired_sessions(
             "message": "Session cleanup completed",
             "sessions_cleaned": cleaned_count,
             "older_than_hours": older_than_hours,
-            "timestamp": datetime.now(timezone.UTC).isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     except Exception as e:
@@ -142,7 +142,8 @@ async def test_agent(
     """
     try:
         valid_agents = [
-            "orchestrator",
+            "pure_sdk",
+            "advanced", 
             "code_b",
             "code_c",
             "code_d",
@@ -165,14 +166,48 @@ async def test_agent(
             query=query,
         )
 
-        # TODO: Implement agent testing logic
-        # This would instantiate the specific agent and test it with the query
+        # Implement agent testing logic  
+        from agent_project.agents.pure_orchestrator import PureSDKOrchestrator
+        from agent_project.agents.advanced import AdvancedOrchestrator
+        
+        result = None
+        test_status = "success"
+        error_message = None
+        
+        try:
+            if agent_type == "pure_sdk":
+                orchestrator = PureSDKOrchestrator()
+                context = {"session_id": "admin-test", "user_id": admin_user.get("sub")}
+                result = await orchestrator.process_query(query, context)
+            elif agent_type == "advanced":
+                orchestrator = AdvancedOrchestrator()
+                context = {"session_id": "admin-test", "user_id": admin_user.get("sub")}
+                result = await orchestrator.process_query(query, context)
+            elif agent_type.startswith("code_"):
+                # Test individual specialist via pure SDK
+                orchestrator = PureSDKOrchestrator()
+                result = await orchestrator.get_specialist_directly(
+                    agent_type, query, 
+                    {"session_id": "admin-test", "user_id": admin_user.get("sub")}
+                )
+            else:
+                test_status = "error"
+                error_message = f"Agent type {agent_type} not implemented"
+                
+        except Exception as e:
+            test_status = "error"
+            error_message = str(e)
+            result = {"error": str(e)}
 
         return {
             "agent_type": agent_type,
             "query": query,
-            "test_result": "Test completed successfully",
-            "timestamp": datetime.now(timezone.UTC).isoformat(),
+            "test_status": test_status,
+            "test_result": result.get("final_output", "") if result else "",
+            "last_agent": result.get("last_agent", agent_type) if result else agent_type,
+            "routing_method": result.get("routing_method", "unknown") if result else "unknown",
+            "error": error_message,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     except HTTPException:
